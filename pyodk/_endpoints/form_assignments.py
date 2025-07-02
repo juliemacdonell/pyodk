@@ -5,11 +5,12 @@ from pyodk._endpoints.bases import Service
 from pyodk._utils import validators as pv
 from pyodk._utils.session import Session
 from pyodk.errors import PyODKError
+from typing import Optional
 
 log = logging.getLogger(__name__)
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class URLs:
     _form: str = "projects/{project_id}/forms/{form_id}"
     post: str = f"{_form}/assignments/{{role_id}}/{{user_id}}"
@@ -21,21 +22,21 @@ class FormAssignmentService(Service):
     def __init__(
         self,
         session: Session,
-        default_project_id: int | None = None,
-        default_form_id: str | None = None,
+        default_project_id: Optional[int] = None,
+        default_form_id: Optional[str] = None,
         urls: URLs = None,
     ):
         self.urls: URLs = urls if urls is not None else URLs()
         self.session: Session = session
-        self.default_project_id: int | None = default_project_id
-        self.default_form_id: str | None = default_form_id
+        self.default_project_id: Optional[int] = default_project_id
+        self.default_form_id: Optional[str] = default_form_id
 
     def assign(
         self,
         role_id: int,
         user_id: int,
-        form_id: str | None = None,
-        project_id: int | None = None,
+        form_id: Optional[str] = None,
+        project_id: Optional[int] = None,
     ) -> bool:
         """
         Assign a user to a role for a form.

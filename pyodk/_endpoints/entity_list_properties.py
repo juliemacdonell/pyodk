@@ -6,6 +6,7 @@ from pyodk._endpoints.bases import Model, Service
 from pyodk._utils import validators as pv
 from pyodk._utils.session import Session
 from pyodk.errors import PyODKError
+from typing import Optional
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +18,7 @@ class EntityListProperty(Model):
     forms: list[str]
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class URLs:
     post: str = "projects/{project_id}/datasets/{entity_list_name}/properties"
 
@@ -33,20 +34,20 @@ class EntityListPropertyService(Service):
     def __init__(
         self,
         session: Session,
-        default_project_id: int | None = None,
-        default_entity_list_name: str | None = None,
+        default_project_id: Optional[int] = None,
+        default_entity_list_name: Optional[str] = None,
         urls: URLs = None,
     ):
         self.urls: URLs = urls if urls is not None else URLs()
         self.session: Session = session
-        self.default_project_id: int | None = default_project_id
-        self.default_entity_list_name: str | None = default_entity_list_name
+        self.default_project_id: Optional[int] = default_project_id
+        self.default_entity_list_name: Optional[str] = default_entity_list_name
 
     def create(
         self,
         name: str,
-        entity_list_name: str | None = None,
-        project_id: int | None = None,
+        entity_list_name: Optional[str] = None,
+        project_id: Optional[int] = None,
     ) -> bool:
         """
         Create an Entity List Property.

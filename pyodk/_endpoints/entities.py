@@ -2,7 +2,7 @@ import logging
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional, Union
 from uuid import uuid4
 
 from pyodk.__version__ import __version__
@@ -50,9 +50,9 @@ class CurrentVersion(Model):
     creatorId: int
     userAgent: str
     version: int
-    data: dict | None = None
-    baseVersion: int | None = None
-    conflictingProperties: list[str] | None = None
+    data: Optional[dict] = None
+    baseVersion: Optional[int] = None
+    conflictingProperties: Optional[list[str]] = None
 
 
 class Entity(Model):
@@ -60,12 +60,12 @@ class Entity(Model):
     creatorId: int
     createdAt: datetime
     currentVersion: CurrentVersion
-    conflict: str | None = None  # null, soft, hard
-    updatedAt: datetime | None = None
-    deletedAt: datetime | None = None
+    conflict: Optional[str] = None  # null, soft, hard
+    updatedAt: Optional[datetime] = None
+    deletedAt: Optional[datetime] = None
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class URLs:
     _entity_name: str = "projects/{project_id}/datasets/{el_name}"
     _entities: str = f"{_entity_name}/entities"
@@ -97,17 +97,17 @@ class EntityService(Service):
     def __init__(
         self,
         session: Session,
-        default_project_id: int | None = None,
-        default_entity_list_name: str | None = None,
+        default_project_id: Optional[int] = None,
+        default_entity_list_name: Optional[str] = None,
         urls: URLs = None,
     ):
         self.urls: URLs = urls if urls is not None else URLs()
         self.session: Session = session
-        self.default_project_id: int | None = default_project_id
-        self.default_entity_list_name: str | None = default_entity_list_name
+        self.default_project_id: Optional[int] = default_project_id
+        self.default_entity_list_name: Optional[str] = default_entity_list_name
 
     def list(
-        self, entity_list_name: str | None = None, project_id: int | None = None
+        self, entity_list_name: Optional[str] = None, project_id: Optional[int] = None
     ) -> list[Entity]:
         """
         Read all Entity metadata.
@@ -138,9 +138,9 @@ class EntityService(Service):
         self,
         label: str,
         data: dict,
-        entity_list_name: str | None = None,
-        project_id: int | None = None,
-        uuid: str | None = None,
+        entity_list_name: Optional[str] = None,
+        project_id: Optional[int] = None,
+        uuid: Optional[str] = None,
     ) -> Entity:
         """
         Create an Entity.
@@ -179,10 +179,10 @@ class EntityService(Service):
     def create_many(
         self,
         data: Iterable[Mapping[str, Any]],
-        entity_list_name: str | None = None,
-        project_id: int | None = None,
-        create_source: str | None = None,
-        source_size: str | None = None,
+        entity_list_name: Optional[str] = None,
+        project_id: Optional[int] = None,
+        create_source: Optional[str] = None,
+        source_size: Optional[str] = None,
     ) -> bool:
         """
         Create one or more Entities in a single request.
@@ -253,12 +253,12 @@ class EntityService(Service):
     def update(
         self,
         uuid: str,
-        entity_list_name: str | None = None,
-        project_id: int | None = None,
-        label: str | None = None,
-        data: dict | None = None,
-        force: bool | None = None,
-        base_version: int | None = None,
+        entity_list_name: Optional[str] = None,
+        project_id: Optional[int] = None,
+        label: Optional[str] = None,
+        data: Optional[dict] = None,
+        force: Optional[bool] = None,
+        base_version: Optional[int] = None,
     ) -> Entity:
         """
         Update an Entity.
@@ -310,8 +310,8 @@ class EntityService(Service):
     def delete(
         self,
         uuid: str,
-        entity_list_name: str | None = None,
-        project_id: int | None = None,
+        entity_list_name: Optional[str] = None,
+        project_id: Optional[int] = None,
     ) -> bool:
         """
         Delete an Entity.
@@ -342,13 +342,13 @@ class EntityService(Service):
 
     def get_table(
         self,
-        entity_list_name: str | None = None,
-        project_id: int | None = None,
-        skip: int | None = None,
-        top: int | None = None,
-        count: bool | None = None,
-        filter: str | None = None,
-        select: str | None = None,
+        entity_list_name: Optional[str] = None,
+        project_id: Optional[int] = None,
+        skip: Optional[int] = None,
+        top: Optional[int] = None,
+        count: Optional[bool] = None,
+        filter: Optional[str] = None,
+        select: Optional[str] = None,
     ) -> dict:
         """
         Read Entity List data.
@@ -401,9 +401,9 @@ class EntityService(Service):
     def _prep_data_for_merge(
         source_data: Iterable[Mapping[str, Any]],
         target_data: Iterable[Mapping[str, Any]],
-        match_keys: Iterable[str] | None = None,
+        match_keys: Optional[Iterable[str]] = None,
         source_label_key: str = "label",
-        source_keys: Iterable[str] | None = None,
+        source_keys: Optional[Iterable[str]] = None,
     ) -> MergeActions:
         """
         Compare source and target data to identify rows to insert, update, or delete.
@@ -494,16 +494,16 @@ class EntityService(Service):
     def merge(
         self,
         data: Iterable[Mapping[str, Any]],
-        entity_list_name: str | None = None,
-        project_id: int | None = None,
-        match_keys: Iterable[str] | None = None,
+        entity_list_name: Optional[str] = None,
+        project_id: Optional[int] = None,
+        match_keys: Optional[Iterable[str]] = None,
         add_new_properties: bool = True,
         update_matched: bool = True,
         delete_not_matched: bool = False,
         source_label_key: str = "label",
-        source_keys: Iterable[str] | None = None,
-        create_source: str | None = None,
-        source_size: str | None = None,
+        source_keys: Optional[Iterable[str]] = None,
+        create_source: Optional[str] = None,
+        source_size: Optional[str] = None,
     ) -> MergeActions:
         """
         Update Entities in Central based on the provided data:

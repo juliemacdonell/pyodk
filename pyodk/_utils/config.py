@@ -2,6 +2,7 @@ import logging
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Optional
 
 import toml
 
@@ -20,7 +21,7 @@ class CentralConfig:
     base_url: str
     username: str
     password: str = field(repr=False)
-    default_project_id: int | None = None
+    default_project_id: Optional[int] = None
 
     def validate(self):
         for key in ["base_url", "username", "password"]:  # Mandatory keys.
@@ -59,11 +60,11 @@ def get_path(path: str, env_key: str) -> Path:
     return defaults[env_key]
 
 
-def get_config_path(config_path: str | None = None) -> Path:
+def get_config_path(config_path: Optional[str] = None) -> Path:
     return get_path(path=config_path, env_key="PYODK_CONFIG_FILE")
 
 
-def get_cache_path(cache_path: str | None = None) -> Path:
+def get_cache_path(cache_path: Optional[str] = None) -> Path:
     return get_path(path=cache_path, env_key="PYODK_CACHE_FILE")
 
 
@@ -80,7 +81,7 @@ def read_toml(path: Path) -> dict:
         raise pyodk_err from err
 
 
-def read_config(config_path: str | None = None) -> Config:
+def read_config(config_path: Optional[str] = None) -> Config:
     """
     Read the config file.
     """
@@ -89,7 +90,7 @@ def read_config(config_path: str | None = None) -> Config:
     return objectify_config(config_data=file_data)
 
 
-def read_cache_token(cache_path: str | None = None) -> str:
+def read_cache_token(cache_path: Optional[str] = None) -> str:
     """
     Read the "token" key from the cache file.
     """
@@ -102,7 +103,7 @@ def read_cache_token(cache_path: str | None = None) -> str:
     return file_data["token"]
 
 
-def write_cache(key: str, value: str, cache_path: str | None = None) -> None:
+def write_cache(key: str, value: str, cache_path: Optional[str] = None) -> None:
     """
     Append or overwrite the given key/value pair to the cache file.
     """
@@ -116,7 +117,7 @@ def write_cache(key: str, value: str, cache_path: str | None = None) -> None:
         toml.dump(file_data, outfile)
 
 
-def delete_cache(cache_path: str | None = None) -> None:
+def delete_cache(cache_path: Optional[str] = None) -> None:
     """
     Delete the cache file, if it exists.
     """

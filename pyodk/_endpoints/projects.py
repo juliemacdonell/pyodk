@@ -2,7 +2,7 @@ import logging
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional, Union
 
 from pyodk._endpoints.bases import Model, Service
 from pyodk._endpoints.form_assignments import FormAssignmentService
@@ -18,17 +18,17 @@ class Project(Model):
     id: int
     name: str
     createdAt: datetime
-    description: str | None = None
-    archived: bool | None = None
-    keyId: int | None = None
-    appUsers: int | None = None
-    forms: int | None = None
-    lastSubmission: str | None = None
-    updatedAt: datetime | None = None
-    deletedAt: datetime | None = None
+    description: Optional[str] = None
+    archived: Optional[bool] = None
+    keyId: Optional[int] = None
+    appUsers: Optional[int] = None
+    forms: Optional[int] = None
+    lastSubmission: Optional[str] = None
+    updatedAt: Optional[datetime] = None
+    deletedAt: Optional[datetime] = None
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class URLs:
     list: str = "projects"
     get: str = "projects/{project_id}"
@@ -53,12 +53,12 @@ class ProjectService(Service):
     def __init__(
         self,
         session: Session,
-        default_project_id: int | None = None,
+        default_project_id: Optional[int] = None,
         urls: URLs = None,
     ):
         self.urls: URLs = urls if urls is not None else URLs()
         self.session: Session = session
-        self.default_project_id: int | None = default_project_id
+        self.default_project_id: Optional[int] = default_project_id
 
     def _default_kw(self) -> dict[str, Any]:
         return {
@@ -79,7 +79,7 @@ class ProjectService(Service):
         data = response.json()
         return [Project(**r) for r in data]
 
-    def get(self, project_id: int | None = None) -> Project:
+    def get(self, project_id: Optional[int] = None) -> Project:
         """
         Read all Project details.
 
@@ -104,8 +104,8 @@ class ProjectService(Service):
     def create_app_users(
         self,
         display_names: Iterable[str],
-        forms: Iterable[str] | None = None,
-        project_id: int | None = None,
+        forms: Optional[Iterable[str]] = None,
+        project_id: Optional[int] = None,
     ) -> Iterable[ProjectAppUser]:
         """
         Create new project app users and optionally assign forms to them.
