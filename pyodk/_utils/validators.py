@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from os import PathLike
 from pathlib import Path
-from typing import Any
+from typing import Any, Union
 
 from pydantic.v1 import validators as v
 from pydantic.v1.errors import PydanticTypeError, PydanticValueError
@@ -98,7 +98,7 @@ def validate_dict(*args: dict, key: str) -> int:
     )
 
 
-def validate_file_path(*args: PathLike | str, key: str = "file_path") -> Path:
+def validate_file_path(*args: Union[PathLike, str], key: str = "file_path") -> Path:
     def validate_fp(f):
         p = v.path_validator(f)
         return v.path_exists_validator(p)

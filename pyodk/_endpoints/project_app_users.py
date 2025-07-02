@@ -6,6 +6,7 @@ from pyodk._endpoints.bases import Model, Service
 from pyodk._utils import validators as pv
 from pyodk._utils.session import Session
 from pyodk.errors import PyODKError
+from typing import Optional
 
 log = logging.getLogger(__name__)
 
@@ -15,10 +16,10 @@ class ProjectAppUser(Model):
     id: int
     displayName: str
     createdAt: datetime
-    type: str | None  # user, field_key, public_link, singleUse
-    token: str | None
-    updatedAt: datetime | None
-    deletedAt: datetime | None
+    type: Optional[str]  # user, field_key, public_link, singleUse
+    token: Optional[str]
+    updatedAt: Optional[datetime]
+    deletedAt: Optional[datetime]
 
 
 @dataclass(frozen=True, slots=True)
@@ -37,16 +38,16 @@ class ProjectAppUserService(Service):
     def __init__(
         self,
         session: Session,
-        default_project_id: int | None = None,
+        default_project_id: Optional[int] = None,
         urls: URLs = None,
     ):
         self.urls: URLs = urls if urls is not None else URLs()
         self.session: Session = session
-        self.default_project_id: int | None = default_project_id
+        self.default_project_id: Optional[int] = default_project_id
 
     def list(
         self,
-        project_id: int | None = None,
+        project_id: Optional[int] = None,
     ) -> list[ProjectAppUser]:
         """
         Read all ProjectAppUser details.
@@ -70,7 +71,7 @@ class ProjectAppUserService(Service):
     def create(
         self,
         display_name: str,
-        project_id: int | None = None,
+        project_id: Optional[int] = None,
     ) -> ProjectAppUser:
         """
         Create a ProjectAppUser.

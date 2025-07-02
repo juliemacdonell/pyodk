@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from typing import Optional
 
 from pyodk._endpoints.comments import CommentService
 from pyodk._endpoints.entities import EntityService
@@ -30,14 +31,14 @@ class Client:
 
     def __init__(
         self,
-        config_path: str | None = None,
-        cache_path: str | None = None,
-        project_id: int | None = None,
-        session: Session | None = None,
-        api_version: str | None = "v1",
+        config_path: Optional[str] = None,
+        cache_path: Optional[str] = None,
+        project_id: Optional[int] = None,
+        session: Optional[Session] = None,
+        api_version: Optional[str] = "v1",
     ) -> None:
         self.config: config.Config = config.read_config(config_path=config_path)
-        self._project_id: int | None = project_id
+        self._project_id: Optional[int] = project_id
         if session is None:
             session = Session(
                 base_url=self.config.central.base_url,
@@ -77,7 +78,7 @@ class Client:
         )
 
     @property
-    def project_id(self) -> int | None:
+    def project_id(self) -> Optional[int]:
         if self._project_id is None:
             return self.config.central.default_project_id
         else:

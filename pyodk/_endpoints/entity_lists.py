@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional
 
 from pyodk._endpoints.bases import Model, Service
 from pyodk._endpoints.entity_list_properties import (
@@ -20,7 +20,7 @@ class EntityList(Model):
     projectId: int
     createdAt: datetime
     approvalRequired: bool
-    properties: list[EntityListProperty] | None = None
+    properties: Optional[list[EntityListProperty]] = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -60,8 +60,8 @@ class EntityListService(Service):
     def __init__(
         self,
         session: Session,
-        default_project_id: int | None = None,
-        default_entity_list_name: str | None = None,
+        default_project_id: Optional[int] = None,
+        default_entity_list_name: Optional[str] = None,
         urls: URLs = None,
     ):
         self.urls: URLs = urls if urls is not None else URLs()
@@ -73,9 +73,9 @@ class EntityListService(Service):
         )
         self.add_property = self._property_service.create
 
-        self._default_project_id: int | None = None
+        self._default_project_id: Optional[int] = None
         self.default_project_id = default_project_id
-        self._default_entity_list_name: str | None = None
+        self._default_entity_list_name: Optional[str] = None
         self.default_entity_list_name = default_entity_list_name
 
     def _default_kw(self) -> dict[str, Any]:
@@ -85,7 +85,7 @@ class EntityListService(Service):
         }
 
     @property
-    def default_project_id(self) -> int | None:
+    def default_project_id(self) -> Optional[int]:
         return self._default_project_id
 
     @default_project_id.setter
@@ -94,7 +94,7 @@ class EntityListService(Service):
         self._property_service.default_project_id = v
 
     @property
-    def default_entity_list_name(self) -> str | None:
+    def default_entity_list_name(self) -> Optional[str]:
         return self._default_entity_list_name
 
     @default_entity_list_name.setter
@@ -102,7 +102,7 @@ class EntityListService(Service):
         self._default_entity_list_name = v
         self._property_service.default_entity_list_name = v
 
-    def list(self, project_id: int | None = None) -> list[EntityList]:
+    def list(self, project_id: Optional[int] = None) -> list[EntityList]:
         """
         Read all Entity List details.
 
@@ -126,8 +126,8 @@ class EntityListService(Service):
 
     def get(
         self,
-        entity_list_name: str | None = None,
-        project_id: int | None = None,
+        entity_list_name: Optional[str] = None,
+        project_id: Optional[int] = None,
     ) -> EntityList:
         """
         Read Entity List details.
@@ -158,9 +158,9 @@ class EntityListService(Service):
 
     def create(
         self,
-        approval_required: bool | None = False,
-        entity_list_name: str | None = None,
-        project_id: int | None = None,
+        approval_required: Optional[bool] = False,
+        entity_list_name: Optional[str] = None,
+        project_id: Optional[int] = None,
     ) -> EntityList:
         """
         Create an Entity List.

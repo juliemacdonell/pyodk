@@ -6,6 +6,7 @@ from pyodk._endpoints.bases import Model, Service
 from pyodk._utils import validators as pv
 from pyodk._utils.session import Session
 from pyodk.errors import PyODKError
+from typing import Optional
 
 log = logging.getLogger(__name__)
 
@@ -34,22 +35,22 @@ class CommentService(Service):
     def __init__(
         self,
         session: Session,
-        default_project_id: int | None = None,
-        default_form_id: str | None = None,
-        default_instance_id: str | None = None,
+        default_project_id: Optional[int] = None,
+        default_form_id: Optional[str] = None,
+        default_instance_id: Optional[str] = None,
         urls: URLs = None,
     ):
         self.urls: URLs = urls if urls is not None else URLs()
         self.session: Session = session
-        self.default_project_id: int | None = default_project_id
-        self.default_form_id: str | None = default_form_id
-        self.default_instance_id: str | None = default_instance_id
+        self.default_project_id: Optional[int] = default_project_id
+        self.default_form_id: Optional[str] = default_form_id
+        self.default_instance_id: Optional[str] = default_instance_id
 
     def list(
         self,
-        form_id: str | None = None,
-        project_id: int | None = None,
-        instance_id: str | None = None,
+        form_id: Optional[str] = None,
+        project_id: Optional[int] = None,
+        instance_id: Optional[str] = None,
     ) -> list[Comment]:
         """
         Read all Comment details.
@@ -79,9 +80,9 @@ class CommentService(Service):
     def post(
         self,
         comment: str,
-        project_id: int | None = None,
-        form_id: str | None = None,
-        instance_id: str | None = None,
+        project_id: Optional[int] = None,
+        form_id: Optional[str] = None,
+        instance_id: Optional[str] = None,
     ) -> Comment:
         """
         Create a Comment.
