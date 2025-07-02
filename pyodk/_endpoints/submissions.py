@@ -3,7 +3,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
 from os import PathLike
-from typing import Any
+from typing import Any, Optional, Union
 
 from pyodk._endpoints.bases import Model, Service
 from pyodk._endpoints.comments import Comment, CommentService
@@ -22,16 +22,16 @@ class Submission(Model):
     instanceId: str
     submitterId: int
     createdAt: datetime
-    deviceId: str | None = None
+    deviceId: Optional[str] = None
     # null, edited, hasIssues, rejected, approved
-    reviewState: str | None = None
-    userAgent: str | None = None
-    instanceName: str | None = None
-    updatedAt: datetime | None = None
-    attachments: list[SubmissionAttachment] | None = None
+    reviewState: Optional[str] = None
+    userAgent: Optional[str] = None
+    instanceName: Optional[str] = None
+    updatedAt: Optional[datetime] = None
+    attachments: Optional[list[SubmissionAttachment]] = None
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class URLs:
     _form: str = "projects/{project_id}/forms/{form_id}"
     list: str = f"{_form}/submissions"
@@ -59,14 +59,14 @@ class SubmissionService(Service):
     def __init__(
         self,
         session: Session,
-        default_project_id: int | None = None,
-        default_form_id: str | None = None,
+        default_project_id: Optional[int] = None,
+        default_form_id: Optional[str] = None,
         urls: URLs = None,
     ):
         self.urls: URLs = urls if urls is not None else URLs()
         self.session: Session = session
-        self.default_project_id: int | None = default_project_id
-        self.default_form_id: str | None = default_form_id
+        self.default_project_id: Optional[int] = default_project_id
+        self.default_form_id: Optional[str] = default_form_id
 
     def _default_kw(self) -> dict[str, Any]:
         return {
@@ -75,7 +75,7 @@ class SubmissionService(Service):
         }
 
     def list(
-        self, form_id: str | None = None, project_id: int | None = None
+        self, form_id: Optional[str] = None, project_id: Optional[int] = None
     ) -> list[Submission]:
         """
         Read all Submission metadata.
@@ -103,8 +103,8 @@ class SubmissionService(Service):
     def get(
         self,
         instance_id: str,
-        form_id: str | None = None,
-        project_id: int | None = None,
+        form_id: Optional[str] = None,
+        project_id: Optional[int] = None,
     ) -> Submission:
         """
         Read Submission metadata.
@@ -135,16 +135,16 @@ class SubmissionService(Service):
 
     def get_table(
         self,
-        form_id: str | None = None,
-        project_id: int | None = None,
-        table_name: str | None = "Submissions",
-        skip: int | None = None,
-        top: int | None = None,
-        count: bool | None = None,
-        wkt: bool | None = None,
-        filter: str | None = None,
-        expand: str | None = None,
-        select: str | None = None,
+        form_id: Optional[str] = None,
+        project_id: Optional[int] = None,
+        table_name: Optional[str] = "Submissions",
+        skip: Optional[int] = None,
+        top: Optional[int] = None,
+        count: Optional[bool] = None,
+        wkt: Optional[bool] = None,
+        filter: Optional[str] = None,
+        expand: Optional[str] = None,
+        select: Optional[str] = None,
     ) -> dict:
         """
         Read Submission data.
@@ -202,11 +202,11 @@ class SubmissionService(Service):
     def create(
         self,
         xml: str,
-        form_id: str | None = None,
-        project_id: int | None = None,
-        device_id: str | None = None,
+        form_id: Optional[str] = None,
+        project_id: Optional[int] = None,
+        device_id: Optional[str] = None,
         encoding: str = "utf-8",
-        attachments: Iterable[PathLike | str] | None = None,
+        attachments: Optional[Iterable[Union[PathLike, str]]] = None,
     ) -> Submission:
         """
         Create a Submission.
@@ -291,8 +291,8 @@ class SubmissionService(Service):
         self,
         instance_id: str,
         xml: str,
-        form_id: str | None = None,
-        project_id: int | None = None,
+        form_id: Optional[str] = None,
+        project_id: Optional[int] = None,
         encoding: str = "utf-8",
     ) -> Submission:
         """
@@ -328,8 +328,8 @@ class SubmissionService(Service):
         self,
         instance_id: str,
         review_state: str,
-        form_id: str | None = None,
-        project_id: int | None = None,
+        form_id: Optional[str] = None,
+        project_id: Optional[int] = None,
     ) -> Submission:
         """
         Update Submission metadata.
@@ -365,9 +365,9 @@ class SubmissionService(Service):
         self,
         instance_id: str,
         xml: str,
-        form_id: str | None = None,
-        project_id: int | None = None,
-        comment: str | None = None,
+        form_id: Optional[str] = None,
+        project_id: Optional[int] = None,
+        comment: Optional[str] = None,
         encoding: str = "utf-8",
     ) -> None:
         """
@@ -406,9 +406,9 @@ class SubmissionService(Service):
         self,
         instance_id: str,
         review_state: str,
-        form_id: str | None = None,
-        project_id: int | None = None,
-        comment: str | None = None,
+        form_id: Optional[str] = None,
+        project_id: Optional[int] = None,
+        comment: Optional[str] = None,
     ) -> None:
         """
         Update Submission metadata and optionally comment on it.
@@ -427,8 +427,8 @@ class SubmissionService(Service):
     def list_comments(
         self,
         instance_id: str,
-        form_id: str | None = None,
-        project_id: int | None = None,
+        form_id: Optional[str] = None,
+        project_id: Optional[int] = None,
     ) -> Iterable[Comment]:
         """
         Read all Comment details.
@@ -447,8 +447,8 @@ class SubmissionService(Service):
         self,
         instance_id: str,
         comment: str,
-        project_id: int | None = None,
-        form_id: str | None = None,
+        project_id: Optional[int] = None,
+        form_id: Optional[str] = None,
     ) -> Comment:
         """
         Create a Comment.

@@ -3,6 +3,7 @@ import mimetypes
 from dataclasses import dataclass
 from datetime import datetime
 from os import PathLike
+from typing import Optional, Union
 
 from pyodk._endpoints.bases import Model, Service
 from pyodk._utils import validators as pv
@@ -22,7 +23,7 @@ class FormAttachment(Model):
     updatedAt: datetime  # When the file was created or deleted
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class URLs:
     _form: str = "projects/{project_id}/forms/{form_id}"
     post: str = f"{_form}/draft/attachments/{{fname}}"
@@ -34,21 +35,21 @@ class FormDraftAttachmentService(Service):
     def __init__(
         self,
         session: Session,
-        default_project_id: int | None = None,
-        default_form_id: str | None = None,
+        default_project_id: Optional[int] = None,
+        default_form_id: Optional[str] = None,
         urls: URLs = None,
     ):
         self.urls: URLs = urls if urls is not None else URLs()
         self.session: Session = session
-        self.default_project_id: int | None = default_project_id
-        self.default_form_id: str | None = default_form_id
+        self.default_project_id: Optional[int] = default_project_id
+        self.default_form_id: Optional[str] = default_form_id
 
     def upload(
         self,
-        file_path: PathLike | str,
-        file_name: str | None = None,
-        form_id: str | None = None,
-        project_id: int | None = None,
+        file_path: Union[PathLike, str],
+        file_name: Optional[str] = None,
+        form_id: Optional[str] = None,
+        project_id: Optional[int] = None,
     ) -> bool:
         """
         Upload a Form Draft Attachment.

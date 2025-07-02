@@ -3,7 +3,7 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from datetime import datetime
 from os import PathLike
-from typing import Any
+from typing import Any, Optional, Union
 
 from pyodk._endpoints.bases import Model, Service
 from pyodk._endpoints.form_draft_attachments import FormDraftAttachmentService
@@ -25,14 +25,14 @@ class Form(Model):
     hash: str
     state: str  # open, closing, closed
     createdAt: datetime
-    name: str | None  # Null if Central couldn't parse the XForm title, or it was blank.
-    enketoId: str | None  # Null if Enketo not being used with Central.
-    keyId: int | None
-    updatedAt: datetime | None
-    publishedAt: datetime | None
+    name: Optional[str]  # Null if Central couldn't parse the XForm title, or it was blank.
+    enketoId: Optional[str]  # Null if Enketo not being used with Central.
+    keyId: Optional[int]
+    updatedAt: Optional[datetime]
+    publishedAt: Optional[datetime]
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class URLs:
     forms: str = "projects/{project_id}/forms"
     get: str = f"{forms}/{{form_id}}"
@@ -55,14 +55,14 @@ class FormService(Service):
     def __init__(
         self,
         session: Session,
-        default_project_id: int | None = None,
-        default_form_id: str | None = None,
+        default_project_id: Optional[int] = None,
+        default_form_id: Optional[str] = None,
         urls: URLs = None,
     ):
         self.urls: URLs = urls if urls is not None else URLs()
         self.session: Session = session
-        self.default_project_id: int | None = default_project_id
-        self.default_form_id: str | None = default_form_id
+        self.default_project_id: Optional[int] = default_project_id
+        self.default_form_id: Optional[str] = default_form_id
 
     def _default_kw(self) -> dict[str, Any]:
         return {
@@ -70,7 +70,7 @@ class FormService(Service):
             "default_form_id": self.default_form_id,
         }
 
-    def list(self, project_id: int | None = None) -> list[Form]:
+    def list(self, project_id: Optional[int] = None) -> list[Form]:
         """
         Read all Form details.
 
@@ -95,7 +95,7 @@ class FormService(Service):
     def get(
         self,
         form_id: str,
-        project_id: int | None = None,
+        project_id: Optional[int] = None,
     ) -> Form:
         """
         Read Form details.
@@ -122,11 +122,11 @@ class FormService(Service):
 
     def create(
         self,
-        definition: PathLike | str | bytes,
-        attachments: Iterable[PathLike | str] | None = None,
-        ignore_warnings: bool | None = True,
-        form_id: str | None = None,
-        project_id: int | None = None,
+        definition: Union[PathLike, str, bytes],
+        attachments: Optional[Iterable[Union[PathLike, str]]] = None,
+        ignore_warnings: Optional[bool] = True,
+        form_id: Optional[str] = None,
+        project_id: Optional[int] = None,
     ) -> Form:
         """
         Create a form.
@@ -179,10 +179,10 @@ class FormService(Service):
     def update(
         self,
         form_id: str,
-        project_id: int | None = None,
-        definition: PathLike | str | bytes | None = None,
-        attachments: Iterable[PathLike | str] | None = None,
-        version_updater: Callable[[str], str] | None = None,
+        project_id: Optional[int] = None,
+        definition: Optional[Union[PathLike, str, bytes]] = None,
+        attachments: Optional[Iterable[Union[PathLike, str]]] = None,
+        version_updater: Optional[Callable[[str], str]] = None,
     ) -> None:
         """
         Update an existing Form. Must specify definition, attachments or both.

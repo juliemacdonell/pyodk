@@ -2,6 +2,7 @@ import logging
 from dataclasses import dataclass
 from io import BytesIO
 from os import PathLike
+from typing import Optional, Union
 from zipfile import is_zipfile
 
 from pyodk._endpoints.bases import Service
@@ -40,8 +41,8 @@ def is_xls_file(buf: bytes) -> bool:
 
 
 def get_definition_data(
-    definition: PathLike | str | bytes | None,
-) -> (bytes, str, str | None):
+    definition: Optional[Union[PathLike, str, bytes]],
+) -> tuple[bytes, str, Optional[str]]:
     """
     Get the form definition data from a path or bytes.
 
@@ -58,7 +59,7 @@ def get_definition_data(
     ):
         content_type = CONTENT_TYPES[".xml"]
         definition_data = definition.encode("utf-8")
-    elif isinstance(definition, str | PathLike):
+    elif isinstance(definition, (str, PathLike)):
         file_path = pv.validate_file_path(definition)
         file_path_stem = file_path.stem
         definition_data = file_path.read_bytes()
@@ -82,7 +83,7 @@ def get_definition_data(
     return definition_data, content_type, file_path_stem
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class URLs:
     _form: str = "projects/{project_id}/forms/{form_id}"
     post: str = f"{_form}/draft"
@@ -95,22 +96,22 @@ class FormDraftService(Service):
     def __init__(
         self,
         session: Session,
-        default_project_id: int | None = None,
-        default_form_id: str | None = None,
+        default_project_id: Optional[int] = None,
+        default_form_id: Optional[str] = None,
         urls: URLs = None,
     ):
         self.urls: URLs = urls if urls is not None else URLs()
         self.session: Session = session
-        self.default_project_id: int | None = default_project_id
-        self.default_form_id: str | None = default_form_id
+        self.default_project_id: Optional[int] = default_project_id
+        self.default_form_id: Optional[str] = default_form_id
 
     def _prep_form_post(
         self,
-        definition: PathLike | str | bytes | None = None,
-        ignore_warnings: bool | None = True,
-        form_id: str | None = None,
-        project_id: int | None = None,
-    ) -> (str, str, dict, dict, bytes | None):
+        definition: Optional[Union[PathLike, str, bytes]] = None,
+        ignore_warnings: Optional[bool] = True,
+        form_id: Optional[str] = None,
+        project_id: Optional[int] = None,
+    ) -> tuple[str, str, dict, dict, Optional[bytes]]:
         """
         Prepare / validate input arguments for POSTing a new form definition or version.
 
@@ -151,10 +152,10 @@ class FormDraftService(Service):
 
     def create(
         self,
-        definition: PathLike | str | bytes | None = None,
-        ignore_warnings: bool | None = True,
-        form_id: str | None = None,
-        project_id: int | None = None,
+        definition: Optional[Union[PathLike, str, bytes]] = None,
+        ignore_warnings: Optional[bool] = True,
+        form_id: Optional[str] = None,
+        project_id: Optional[int] = None,
     ) -> bool:
         """
         Create a Form Draft.
@@ -184,9 +185,9 @@ class FormDraftService(Service):
 
     def publish(
         self,
-        form_id: str | None = None,
-        project_id: int | None = None,
-        version: str | None = None,
+        form_id: Optional[str] = None,
+        project_id: Optional[int] = None,
+        version: Optional[str] = None,
     ) -> bool:
         """
         Publish a Form Draft.

@@ -1,10 +1,11 @@
 from requests import Response
+from typing import Union
 
 
 class PyODKError(Exception):
     """An error raised by pyodk."""
 
-    def is_central_error(self, code: float | str) -> bool:
+    def is_central_error(self, code: Union[float, str]) -> bool:
         """
         Does the PyODK error represent a Central error with the specified code?
 
